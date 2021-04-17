@@ -43,14 +43,15 @@ module.exports.newMovie = (req, res, next) => {
 };
 
 module.exports.deleteMovie = (req, res, next) => {
-  const { movieIdDel } = req.params;
-  MovieSchema.findOneAndRemove({ movieId: movieIdDel })
+  const { movieId } = req.params;
+  MovieSchema.findById(movieId)
     .orFail(new NotFoundError('Фильм не найден'))
     .then((movie) => {
       if (movie.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Нельзя удалять чужие фильмы');
       }
-      res.status(200).send(movie);
+      movie.remove()
+        .then((movieNew) => res.status(200).send(movieNew));
     })
     .catch(next);
 };

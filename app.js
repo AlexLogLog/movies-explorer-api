@@ -3,17 +3,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { celebrate, Joi, CelebrateError } = require('celebrate');
+const { CelebrateError } = require('celebrate');
 const BadRequestError = require('./errors/BadRequestError');
 const NotFoundError = require('./errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const users = require('./routes/users.js');
-const movies = require('./routes/movie.js');
-const auth = require('./middlewares/auth');
-const {
-  newUser,
-  login,
-} = require('./controlles/users');
+const main = require('./routes/index');
 
 const { PORT = 3000 } = process.env;
 
@@ -25,6 +19,7 @@ mongoose.connect('mongodb://localhost:27017/diplom', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
+
 const options = {
   origin: [
     '*',
@@ -39,20 +34,7 @@ app.use('*', cors(options));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const userValidate = {
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-    name: Joi.string().required().min(3),
-  }),
-};
-
-const userInValidate = {
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-};
+app.use(main);
 
 app.get('/crash-test', () => {
   setTimeout(() => {
@@ -62,16 +44,11 @@ app.get('/crash-test', () => {
 
 app.use(requestLogger);
 
-app.post('/signin', celebrate(userInValidate), login);
-app.post('/signup', celebrate(userValidate), newUser);
-app.use('/users', auth, users);
-app.use('/movies', auth, movies);
-
-app.use(errorLogger);
-
 app.all('*', (req, res, next) => {
   next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
+
+app.use(errorLogger);
 
 app.use((err, req, res, next) => {
   let error = err;

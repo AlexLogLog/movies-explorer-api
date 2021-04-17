@@ -37,6 +37,12 @@ movies.post('/',
   }),
   newMovie);
 
-movies.delete('/:movieIdDel', deleteMovie);
+movies.delete('/:movieId',
+  celebrate({
+    params: Joi.object().keys({
+      movieId: Joi.string().hex().length(24),
+    }),
+  }),
+  deleteMovie);
 
 module.exports = movies;
