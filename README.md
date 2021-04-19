@@ -4,5 +4,5 @@
   
 Публичный IP-адрес сервера: 178.154.212.237
 
-Домен, по которому можно обратиться к backend: https://alexlog.diplom.nomoredomains.icu/
+Домен, по которому можно обратиться к backend: https://api.alexlog.diplom.nomoredomains.monster/
 
