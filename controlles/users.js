@@ -5,7 +5,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const ConflictError = require('../errors/ConflictError');
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET = 'secret-key' } = process.env;
 
 module.exports.getUsers = (req, res, next) => {
   UserSchema.find({})

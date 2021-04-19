@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { CelebrateError } = require('celebrate');
 const BadRequestError = require('./errors/BadRequestError');
-const NotFoundError = require('./errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const main = require('./routes/index');
 
@@ -30,23 +29,13 @@ const options = {
   allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
 };
 
+app.use(requestLogger);
+
 app.use('*', cors(options));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(main);
-
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
-
-app.use(requestLogger);
-
-app.all('*', (req, res, next) => {
-  next(new NotFoundError('Запрашиваемый ресурс не найден'));
-});
 
 app.use(errorLogger);
 
